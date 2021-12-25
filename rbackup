@@ -1,0 +1,10 @@
+#!/bin/bash
+
+PATH=".:${PATH}"
+export BACKUP_SRC=$(realpath ./input)
+export BACKUP_DEST=$(realpath ./output)
+# export BACKUP_SRC=$(realpath /home/daniel)
+# export BACKUP_DEST=$(realpath /media/sdc1/backups/gentoo-home)
+export ARCHIVE_DEST="danielittlewood.xyz:/home/private"
+
+rbackup-$1 "${@:2}"
