@@ -15,6 +15,10 @@ cd rbackup
 
 Since it sets up hard links, you can remove the source dir now if you want.
 
+## Dependencies
+
+
+
 ## Configuration
 
 In order to run rbackup, you have to provide some information.
@@ -90,12 +94,12 @@ above, and `action` is one of the following.
   only that will be deleted. For example, to abort a restore, you can run
   `rbackup <name> clean snapshots.restore`.
 
+## Scheduling
+
 Any remote data transfer will be done via ssh, so non-interactive access will
 require paswordless authentication to be configured. Similarly with decryption,
 it is expected that a passphrase will be used interactively for unpacking
 archives.
-
-## Scheduling
 
 Scheduling has been tested with cron and anacron, in user mode. For help
 setting up anacron in user mode, see [Alexander Keil's
@@ -145,3 +149,9 @@ inotifywait -r -e modify -e move -e delete ~/bin && rbackup bin snapshot
 ```
 
 A user interested in this approach should check out [incron](http://inotify.aiken.cz/?section=incron&page=about&lang=en).
+
+## Dependencies
+
+* bash and rsync, obviously.
+* Standard linux utilities: tar, gpg, find, awk, grep, sed.
+* cron, anacron or inotify if desired.
