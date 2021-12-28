@@ -43,10 +43,51 @@ recipient = you@email.com
 excludes = node_modules .cache cache* Cache* tmp .rbenv .npm Trash
 ```
 
-Usage:
-* rbackup snapshot: Snapshot your directory $BACKUP_SRC
-* rbackup archive: Bundle your existing snapshots into a tarball
-* rbackup push: Push your existing archives to a remote
-* rbackup pull [$1]: Pull down a specific archive (or list all remote archives)
-* rbackup extract [$1]: Extract a tarball into snapshots (or list all local archives)
-* rbackup restore [$1]: Restore a snapshot to $BACKUP_SRC (or list all available snapshots)
+## Usage
+
+The invocation of rbackup generally takes the form
+
+```
+rbackup <name> <action> args
+```
+
+where `<name>` is the name assigned in `rbackup.ini` (`home`) in the example
+above, and `action` is one of the following.
+
+* `rbackup <name> snapshot`: Produces an incremental snapshot of the config
+  entry `name`.  When run for the first time, it will produce a full copy at
+  the location `destination`.  On subsequent invocations, unchanged files will
+  be referred to with a hard link.  Snapshots are stored in a directory
+  `snapshots` relative to `destination`.
+
+* `rbackup <name> archive`: Bundle all existing snapshots into an archive.  If
+  a recipient is provided, it will be passed to gpg as the ID used for
+  encryption.  Archives are stored in a directory `archives` relative to
+  `destination`.
+
+* `rbackup <name> push`: Push all archives to a location. This is expected to
+  be remote, but can be a local directory (a mounted hard drive, for example).
+
+* `rbackup <name> pull [$1]`: With no arguments, shows all the remote archives
+  available.  If the relative path of an archive is provided as argument, that
+  archive will be downloaded to the local `archives` directory.
+
+* `rbackup <name> extract [$1]`: With no arguments, shows all archives
+  available to be extracted.  If a relative path is provided as argument, it
+  will extract the provided archive to `snapshots.restore`.  (this keeps any
+  background processes from interfering with the restore).
+
+* `rbackup <name> restore [$1]`: With no arguments, shows all snapshots in
+  `snapshots` or `snapshots.restore`.  If a relative path is provided, the live
+  directory will be refreshed from the snapshot.  The restore is only additive
+  - if new files have been added, they won't be removed.
+
+* `rbackup <name> clean [dir]`: With no arguments, cleans all snapshots and
+  archives for `<name>` from the system. If a relative path is provided, then
+  only that will be deleted. For example, to abort a restore, you can run
+  `rbackup <name> clean snapshots.restore`.
+
+Any remote data transfer will be done via ssh, so non-interactive access will
+require paswordless authentication to be configured. Similarly with decryption,
+it is expected that a passphrase will be used interactively for unpacking
+archives.
