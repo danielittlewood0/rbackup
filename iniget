@@ -9,36 +9,32 @@
 # https://creativecommons.org/2015/10/08/cc-by-sa-4-0-now-one-way-compatible-with-gplv3/
 
 function iniget() {
-  if [[ $# -lt 2 || ! -f $1 ]]; then
+  if [[ $# -lt 2 ]]; then
     echo "usage: iniget <file> [--list|<section> [key]]"
+    return 1
+  fi
+  if [[ ! -f $1 ]]; then
+    echo "Error: No such file $1"
     return 1
   fi
   local inifile=$1
 
   if [ "$2" == "--list" ]; then
-    for section in $(cat $inifile | grep "\[" | sed -e "s#\[##g" | sed -e "s#\]##g"); do
-      echo $section
-    done
+    # [][] below is parsed as a character class containing ][.
+    # [\[\]] doesn't work because \ does not escape in a character class.
+    grep "\[" "$inifile" | sed "s/[][]//g"
+    return 0
+  else
+    local section=$2
+    local key
+    [ $# -eq 3 ] && key=$3
+
+    awk '/\[/{prefix=$0; next} $1{print prefix $0}' $inifile | # Flatten the section headers to [section]key = value
+      grep "\[${section}\]${key}" |                            # Find all keys in this section
+      sed "s/^\[${section}\]//" |                              # Remove the section prefix
+      sed "s/^${key}\s*=\s*//"                                 # Remove "key = ", leaving the value
     return 0
   fi
-
-  local section=$2
-  local key
-  [ $# -eq 3 ] && key=$3
-
-  # https://stackoverflow.com/questions/49399984/parsing-ini-file-in-bash
-  # This awk line turns ini sections => [section-name]key=value
-  local lines=$(awk '/\[/{prefix=$0; next} $1{print prefix $0}' $inifile)
-  for line in $lines; do
-    if [[ "$line" = \[$section\]* ]]; then
-      local keyval=$(echo $line | sed -e "s/^\[$section\]//")
-      if [[ -z "$key" ]]; then
-        echo $keyval
-      else          
-        if [[ "$keyval" = $key=* ]]; then
-          echo $(echo $keyval | sed -e "s/^$key=//")
-        fi
-      fi
-    fi
-  done
 }
+
+iniget "$@"
