@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Avoid backing up your own backups.
+EXCLUDES+=("/$(realpath --relative-to=$BACKUP_SRC $BACKUP_DEST) .data/rbackup") 
+
 mkdir -p $BACKUP_DEST/snapshots
 NOW=$(date +%Y%m%d%H%M%S)
 

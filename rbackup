@@ -15,8 +15,6 @@ ARCHIVE_DEST="$(iniget ${CONFIG_FILE} $1 "remote")"
 GPG_RECIPIENT="$(iniget ${CONFIG_FILE} $1 "recipient")" 
 # Optional rsync excludes. Provided to keep backups lean.
 EXCLUDES=($(iniget ${CONFIG_FILE} $1 "excludes")) 
-# Avoid backing up your own backups.
-EXCLUDES+=("/$(realpath --relative-to=$BACKUP_SRC $BACKUP_DEST) .data/rbackup") 
 shift
 
 action=$1 && shift
