@@ -7,7 +7,7 @@ CONFIG_FILE="$HOME/.config/rbackup/rbackup.ini"
 
 # Cannot be blank.
 BACKUP_SRC="$(iniget ${CONFIG_FILE} $1 "source")" 
-# Can be local or remote. Cannot be blank.
+# Must be local. Cannot be remote.
 BACKUP_DEST="$(iniget ${CONFIG_FILE} $1 "destination")" 
 # If blank, archives cannot be pushed to a remote. Only makes sense if snapshots are stored locally.
 ARCHIVE_DEST="$(iniget ${CONFIG_FILE} $1 "remote")" 
@@ -19,5 +19,6 @@ EXCLUDES=($(iniget ${CONFIG_FILE} $1 "excludes"))
 EXCLUDES+=("/$(realpath --relative-to=$BACKUP_SRC $BACKUP_DEST) .data/rbackup") 
 shift
 
+action=$1 && shift
 # delegate required action to its own script
-source rbackup-$1.bash "${@:2}"
+source rbackup-$action.bash "$@"
