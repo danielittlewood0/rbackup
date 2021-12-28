@@ -5,7 +5,7 @@ if [ -d "$BACKUP_DEST/snapshots.restore" ]; then
 elif [ -n "$1" ]; then
   mkdir -p "$BACKUP_DEST/snapshots.restore"
   gpg --decrypt "$BACKUP_DEST/$1" |
-    tar --extract --directory="$BACKUP_DEST/snapshots.restore" &&
+    tar --extract --directory="$BACKUP_DEST/snapshots.restore" --gzip &&
     rm $BACKUP_DEST/$1
   rmdir "$BACKUP_DEST/snapshots.restore" --ignore-fail-on-non-empty # only cleans up if rsync failed
 else

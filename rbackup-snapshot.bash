@@ -6,7 +6,7 @@ EXCLUDES+=("/$(realpath --relative-to=$BACKUP_SRC $BACKUP_DEST) .data/rbackup")
 mkdir -p $BACKUP_DEST/snapshots
 NOW=$(date +%Y%m%d%H%M%S)
 
-OPTS="-a --compress"
+OPTS="--archive --compress"
 OPTS="$OPTS -xx" # avoid backing up mount points
 OPTS="$OPTS -hvP" # if debugging
 

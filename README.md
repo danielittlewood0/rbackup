@@ -43,6 +43,9 @@ recipient = you@email.com
 excludes = node_modules .cache cache* Cache* tmp .rbenv .npm Trash
 ```
 
+The .ini parser is another shell script, `iniget`, adapted from 
+[a StackOverflow answer](https://stackoverflow.com/questions/49399984/parsing-ini-file-in-bash).
+
 ## Usage
 
 The invocation of rbackup generally takes the form
@@ -58,7 +61,7 @@ above, and `action` is one of the following.
   entry `name`.  When run for the first time, it will produce a full copy at
   the location `destination`.  On subsequent invocations, unchanged files will
   be referred to with a hard link.  Snapshots are stored in a directory
-  `snapshots` relative to `destination`.
+  `snapshots` relative to `destination`. Mount points are not included.
 
 * `rbackup <name> archive`: Bundle all existing snapshots into an archive.  If
   a recipient is provided, it will be passed to gpg as the ID used for
@@ -126,10 +129,11 @@ rbackup home archive && rbackup home push
 ### Disk usage
 
 Given a source to back up of total size X, a snapshot directory consumes about
-X, and each standalone archive also consumes X. So you naively need around 3X
+X, and each standalone archive consumes a less than X, depending on how
+compressible your files are. So you naively need (in the worst case) about 3X
 space on your drive to avoid running out. By passing --remove-files to tar, we
-can get away with somewhere between 2X and 3X.  Exactly how much depends on how
-large your files are.
+can get away with less than 2X in typical cases. Exactly how much depends on
+how large your files are.
 
 ## Snapshot on file change
 
