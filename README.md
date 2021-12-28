@@ -1,5 +1,5 @@
 # rbackup
-rsync-based backup scripts
+rsync-based backup scripts, [implementing a strategy from Anouar Adlani](https://anouar.adlani.com/2011/12/how-to-backup-with-rsync-tar-gpg-on-osx.html).
 
 ## Installation
 
@@ -91,3 +91,53 @@ Any remote data transfer will be done via ssh, so non-interactive access will
 require paswordless authentication to be configured. Similarly with decryption,
 it is expected that a passphrase will be used interactively for unpacking
 archives.
+
+## Scheduling
+
+Scheduling has been tested with cron and anacron, in user mode. For help
+setting up anacron in user mode, see [Alexander Keil's
+article](http://akeil.net/posts/user-controlled-anacron.html).
+
+As an example, I snapshot my home directory hourly, and push an archive once a week. Hence,
+I have:
+
+```
+$ tree ~/.config/anacron/
+/home/daniel/.config/anacron/
+├── anacrontab
+├── cron.daily
+├── cron.hourly
+│   └── rbackup-home
+├── cron.monthly
+└── cron.weekly
+    └── rbackup-archive-home
+
+$ cat ~/.config/anacron/cron.hourly/rbackup-home
+#!/bin/bash
+
+rbackup home snapshot
+
+$ cat ~/.config/anacron/cron.weekly/rbackup-archive-home
+#!/bin/bash
+
+rbackup home archive && rbackup home push
+```
+
+### Disk usage
+
+Given a source to back up of total size X, a snapshot directory consumes about
+X, and each standalone archive also consumes X. So you naively need around 3X
+space on your drive to avoid running out. By passing --remove-files to tar, we
+can get away with somewhere between 2X and 3X.  Exactly how much depends on how
+large your files are.
+
+## Snapshot on file change
+
+If you prefer, you can watch for certain events, and create a snapshot whenever
+a directory changes. One could call the following in a loop, for example:
+
+```
+inotifywait -r -e modify -e move -e delete ~/bin && rbackup bin snapshot
+```
+
+A user interested in this approach should check out [incron](http://inotify.aiken.cz/?section=incron&page=about&lang=en).
