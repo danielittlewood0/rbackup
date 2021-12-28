@@ -3,11 +3,21 @@
 ##### Parse config file #####
 
 # default location of config file
-CONFIG_FILE='$HOME/.config/rbackup/rbackup.ini'
-BACKUP_SRC="$(iniget ${CONFIG_FILE} $1 "source")"
-BACKUP_DEST="$(iniget ${CONFIG_FILE} $1 "destination")"
-ARCHIVE_DEST="$(iniget ${CONFIG_FILE} $1 "remote")"
-GPG_RECIPIENT="$(iniget ${CONFIG_FILE} $1 "recipient")"
+CONFIG_FILE="$HOME/.config/rbackup/rbackup.ini"
+
+# Cannot be blank.
+BACKUP_SRC="$(iniget ${CONFIG_FILE} $1 "source")" 
+# Can be local or remote. Cannot be blank.
+BACKUP_DEST="$(iniget ${CONFIG_FILE} $1 "destination")" 
+# If blank, archives cannot be pushed to a remote. Only makes sense if snapshots are stored locally.
+ARCHIVE_DEST="$(iniget ${CONFIG_FILE} $1 "remote")" 
+# If blank, archives are not encrypted.
+GPG_RECIPIENT="$(iniget ${CONFIG_FILE} $1 "recipient")" 
+# Optional rsync excludes. Provided to keep backups lean.
+EXCLUDES=($(iniget ${CONFIG_FILE} $1 "excludes")) 
+# Avoid backing up your own backups.
+EXCLUDES+=("/$(realpath --relative-to=$BACKUP_SRC $BACKUP_DEST) .data/rbackup") 
 shift
 
+# delegate required action to its own script
 source rbackup-$1.bash "${@:2}"

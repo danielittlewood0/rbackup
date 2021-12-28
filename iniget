@@ -8,6 +8,7 @@
 # permitted by the one-way compatibility declaration below:
 # https://creativecommons.org/2015/10/08/cc-by-sa-4-0-now-one-way-compatible-with-gplv3/
 
+# Doesn't support comments, but that would be trivial to add
 function iniget() {
   if [[ $# -lt 2 ]]; then
     echo "usage: iniget <file> [--list|<section> [key]]"
