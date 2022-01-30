@@ -15,10 +15,6 @@ cd rbackup
 
 Since it sets up hard links, you can remove the source dir now if you want.
 
-## Dependencies
-
-
-
 ## Configuration
 
 In order to run rbackup, you have to provide some information.
@@ -83,6 +79,8 @@ above, and `action` is one of the following.
   available to be extracted.  If a relative path is provided as argument, it
   will extract the provided archive to `snapshots.restore`.  (this keeps any
   background processes from interfering with the restore).
+  A .gpg archive will be decrypted before extraction.
+
 
 * `rbackup <name> restore [$1]`: With no arguments, shows all snapshots in
   `snapshots` or `snapshots.restore`.  If a relative path is provided, the live
